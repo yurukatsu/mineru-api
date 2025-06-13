@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
 
   app:
+    image: yurukatsu/mineru-api:latest
     build: .
     ports:
       - "${FASTAPI_PORT:-8000}:8000"
@@ -24,6 +25,7 @@ services:
     restart: unless-stopped
 
   worker:
+    image: yurukatsu/mineru-api:latest
     build: .
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
