@@ -1,0 +1,41 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  app:
+    build: .
+    ports:
+      - "${FASTAPI_PORT:-8000}:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    working_dir: /app
+    tty: true
+    volumes:
+      - shared_temp:/tmp/shared
+    command: ["sh", "-c", "uv run uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload"]
+    restart: unless-stopped
+
+  worker:
+    build: .
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    volumes:
+      - shared_temp:/tmp/shared
+    working_dir: /app
+    command: ["sh", "-c", "uv run celery -A api.app.celery_app worker --loglevel=info"]
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  shared_temp:

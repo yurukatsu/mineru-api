@@ -1,0 +1,108 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/c851f1ddbb3a91b017b7aaddaf05c123af8bf8fb7efe1c5fde15bd53ca439a5f.jpg",
+        "img_caption": [
+            "Figure 2: The self-supervised training procedure of FWT. FWT synthesizes $x _ { t : t + T }$ when given a history time series $x _ { 0 : t }$ , which is used to query top- $\\mathbf { \\nabla } \\cdot k$ most relevant stocks to construct conditional observations. FWT predicts noise from noisy target xtarget at the diffusion step $h$ to recover $x _ { t : t + T }$ . "
+        ],
+        "img_footnote": [],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "the same market or across different markets. By concatenation, the value of the observed multivariate time series is: ",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\mathbf { X } = \\{ r _ { 0 : K + 1 , 0 : t + T } \\} \\in \\mathbb { R } ^ { ( k + 1 ) \\times ( t + T ) }\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "We also denote an observation mask as $\\textbf { M } = \\ \\{ m _ { 0 : K + 1 , 0 : t + T } \\} \\ \\in$ $\\{ 0 , 1 \\} ^ { ( k + 1 ) \\times ( t + T ) }$ , where $m _ { 0 , t : t + T } = 0$ and $m _ { \\mathrm { e l s e } } \\ = \\ 1$ . The mask filters the future part $Y _ { S _ { 0 } }$ of stock $S _ { 0 }$ . Our goal is to synthesize a time series $Y _ { S _ { 0 } } ^ { \\prime }$ to approximate the real $Y _ { S _ { 0 } }$ . To achieve the goal, we utilize the retrieval results as condition and deploy a diffusion method as is described in the next section3.2. ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "We emphasize that the retrieval process can run on all frequencies of stock dynamics. This setting is named Multi-frequency Generation, whose result will be shown in Section 4.2. Besides, we can apply retrieval filtering rules to identify different forms of conditions to control the generation. in order to retrieve-generate data from various sources of time-series for downstream tasks. In this paper, we explore two more cases: 1) Cross-market generation, which retrieves from other markets; and 2) What-if generation, which recalls from the provided time series database. The results will be presented in Section 4.2. ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3.2 Generation ",
+        "text_level": 1,
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "We utilize a conditional diffusion model to generate the future price trajectory of the target stock $S _ { 0 }$ . To begin with, in conventional DDPM [13], given data $\\mathbf { x } _ { 0 } \\sim p ( \\mathbf { x } _ { 0 } )$ , the forward process is a MarkovGaussian process that gradually adds noise to obtain a perturbed sequence $\\{ x _ { 1 } , x _ { 2 } , \\cdots , x _ { H } \\}$ , ",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\nq ( \\mathbf { x } _ { 1 } , \\cdots , \\mathbf { x } _ { H } \\mid \\mathbf { x } _ { 0 } ) = \\prod _ { h = 1 } ^ { H } q ( \\mathbf { x } _ { h } \\mid \\mathbf { x } _ { h - 1 } ) ,\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "where $q ( \\mathbf { x } _ { h } \\mid \\mathbf { x } _ { h - 1 } ) = N ( \\mathbf { x } _ { h } ; { \\sqrt { 1 - \\beta _ { h } } } \\mathbf { x } _ { h - 1 } , \\beta _ { h } \\mathbf { I } )$ , I is the identity matrix, $\\beta _ { h }$ is a learnable parameter, $H$ is the number of diffusion steps, $q$ represents the forward process, and $N$ denotes the Gaussian distribution parameterized by hyperparameters $\\{ \\beta _ { h } \\} _ { h \\in [ H ] }$ . Perturbed samples are sampled via $x _ { h } = \\sqrt { \\bar { \\alpha } _ { h } } x _ { 0 } + \\sqrt { 1 - \\bar { \\alpha } _ { h } } \\bar { \\epsilon }$ , where $\\epsilon \\sim { \\cal N } ( 0 , { \\bf { I } } )$ , $\\alpha _ { h } = 1 - \\beta _ { h }$ and $\\begin{array} { r } { \\bar { \\alpha _ { h } } = \\prod _ { s = 1 } ^ { h } \\alpha _ { s } } \\end{array}$ . For the reverse process, the model learns to predict noise $\\epsilon$ from the noisy target $\\mathbf { x } _ { h }$ at the diffusion step $h$ to recover the original data $\\mathbf { x } _ { 0 }$ . It introduces a specific parameterization of $p _ { \\theta } ( \\mathbf { x } _ { h - 1 } \\mid \\mathbf { x } _ { h } )$ : ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array} { l } { \\displaystyle \\mu ^ { \\mathrm { D D P M } } ( \\mathbf { x } _ { h } , h ) = \\frac { 1 } { \\alpha _ { h } } ( \\mathbf { x } _ { h } - \\frac { \\beta _ { h } } { \\sqrt { 1 - \\alpha _ { h } } } \\epsilon _ { \\theta } ( \\mathbf { x } _ { h } , h ) ) } \\\\ { \\displaystyle \\sigma ^ { \\mathrm { D D P M } } ( \\mathbf { x } _ { h } , h ) = \\sqrt { \\bar { \\beta } _ { h } } } \\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "The training loss [13] for diffusion models is to predict the normalized noise $\\epsilon$ by solving the following optimization problem: ",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\operatorname* { m i n } _ { \\theta } \\mathbb { E } _ { \\mathbf { x } _ { 0 } \\sim p ( \\mathbf { x } _ { 0 } ) , \\epsilon \\sim N ( 0 , \\mathbf { I } ) , h } \\left[ \\lVert \\epsilon - \\epsilon _ { \\theta } ( \\mathbf { x } _ { h } , h ) \\rVert _ { 2 } ^ { 2 } \\right] ,\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "The denoising function $\\epsilon _ { \\theta }$ estimates the noise $\\epsilon$ that was added to the noisy target ${ \\bf x } _ { h }$ at the diffusion step $h$ . ",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Then, we consider extending the parameterization of DDPM to the conditional case. We define a conditional denoising function $\\epsilon _ { \\theta } : ( \\chi ^ { \\mathrm { t a r g e t } } { \\times } \\mathbb { R } \\mid \\chi ^ { \\mathrm { c o n d } } ) \\to X ^ { \\mathrm { t a r g e t } }$ , which takes conditional observations $\\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } }$ as inputs. We consider the following parameterization with $\\epsilon _ { \\theta }$ : ",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\begin{array} { r l } & { \\mu _ { \\boldsymbol { \\theta } } ( \\mathbf { x } _ { h } ^ { \\mathrm { t a r g e t } } , h \\mid \\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } } ) = \\mu ^ { \\mathrm { D D P M } } ( \\mathbf { x } _ { h } ^ { \\mathrm { t a r g e t } } , h , \\epsilon _ { \\boldsymbol { \\theta } } ( \\mathbf { x } _ { h } ^ { \\mathrm { t a r g e t } } , h \\mid \\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } } ) ) } \\\\ & { \\sigma _ { \\boldsymbol { \\theta } } ( \\mathbf { x } _ { h } ^ { \\mathrm { t a r g e t } } , h \\mid \\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } } ) = \\sigma ^ { \\mathrm { D D P M } } ( \\mathbf { x } _ { h } ^ { \\mathrm { t a r g e t } } , h ) } \\end{array}\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "For the sampling, we set all observed values $\\mathbf { x } _ { 0 }$ as conditional observations $\\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } }$ and all missing values as the target xtarget to be generated. We sample noisy targets xtℎar ${ \\bf x } _ { h } ^ { \\mathrm { t a r g e t } } = \\sqrt { \\bar { \\alpha } _ { h } } { \\bf x } _ { 0 } ^ { \\mathrm { t a r g e t } } + \\sqrt { 1 - \\bar { \\alpha } _ { h } } \\epsilon$ and train $\\epsilon _ { \\theta }$ by minimizing the loss: ",
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "text": "$$\n\\underset { \\theta } { \\operatorname* { m i n } } \\mathbb { E } _ { \\mathbf { x } _ { 0 } \\sim p ( \\mathbf { x } _ { 0 } ) , \\epsilon \\sim \\mathcal { N } ( \\mathbf { 0 } , \\mathbf { I } ) , h } \\left[ \\left\\| \\epsilon - \\epsilon _ { \\theta } ( \\mathbf { x } _ { h } ^ { \\mathrm { t a r g e t } } , h \\mid \\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } } ) \\right\\| _ { 2 } ^ { 2 } \\right] .\n$$",
+        "text_format": "latex",
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "As is illustrated in Figure 2, given a sample $\\mathbf { x } _ { 0 }$ , we separate it into conditional observations $\\mathbf { x } _ { 0 } ^ { \\mathrm { c o n d } }$ and the target xt0arget. In market synthesization, the target xt0arget = M ∗ X is the future price trajectory of the target stock $S _ { 0 }$ over the interval $[ t , t + T )$ , and ",
+        "page_idx": 0
+    }
+]
